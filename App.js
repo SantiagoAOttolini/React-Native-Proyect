@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -13,18 +13,34 @@ import imageDiamond from "./assets/diaomond.png";
 import * as ImgPicker from "expo-image-picker";
 
 export default function App() {
+
+  const [selectedImg, setSelectedImg] = useState(null);
+
   let openImagePickerAsync = async () => {
+    //Permission to acces galery
     let permissionResult = await ImgPicker.requestMediaLibraryPermissionsAsync();
     if (permissionResult.granted == false) {
       alert("Permision to acces camera is required");
       return;
     }
+    //Return de img selected to the galery
+    const pickerResult = await ImgPicker.launchImageLibraryAsync();
+    if (pickerResult.cancelled === true) {
+      return;
+    }
+
+    setSelectedImg({ localUri: pickerResult.uri });
   };
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Hello World</Text>
       <Image
-        source={{ uri: "https://picsum.photos/200/200" }}
+        source={{
+          uri:
+            selectedImg !== null
+              ? selectedImg.localUri
+              : "http://picsum.photo/200/200",
+        }}
         /* source={imageDiamond} */
         style={styles.image}
       />
@@ -52,6 +68,7 @@ const styles = StyleSheet.create({
   image: {
     width: 200,
     height: 200,
+    resizeMode:"contain"
   },
   btn: {
     marginBottom: 20,
