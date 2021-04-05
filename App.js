@@ -11,9 +11,9 @@ import {
 } from "react-native";
 import imageDiamond from "./assets/diaomond.png";
 import * as ImgPicker from "expo-image-picker";
+import * as Sharing from "expo-sharing";
 
 export default function App() {
-
   const [selectedImg, setSelectedImg] = useState(null);
 
   let openImagePickerAsync = async () => {
@@ -31,23 +31,38 @@ export default function App() {
 
     setSelectedImg({ localUri: pickerResult.uri });
   };
+
+  const openShareDialog = async () => {
+    if (!(await Sharing.isAvailableAsync())) {
+      alert("Sharing is not available in your platform");
+      return;
+    }
+    await Sharing.shareAsync(selectedImg.localUri);
+  };
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Hello World</Text>
-      <Image
-        source={{
-          uri:
-            selectedImg !== null
-              ? selectedImg.localUri
-              : "http://picsum.photo/200/200",
-        }}
-        /* source={imageDiamond} */
-        style={styles.image}
-      />
-      <Button color="red" title="Add" onPress={openImagePickerAsync} />
-      <TouchableOpacity style={styles.btn}>
-        <Text style={styles.textBtn}>Hola</Text>
+      <Text style={styles.title}>Select an image</Text>
+      <TouchableOpacity onPress={openImagePickerAsync}>
+        <Image
+          source={{
+            uri:
+              selectedImg !== null
+                ? selectedImg.localUri
+                : "http://picsum.photo/200/200",
+          }}
+          /* source={imageDiamond} */
+          style={styles.image}
+        />
       </TouchableOpacity>
+
+      {/* <Button color="red" title="Add"/> */}
+      {selectedImg ? (
+        <TouchableOpacity onPress={openShareDialog} style={styles.btn}>
+          <Text style={styles.textBtn}>Share image</Text>
+        </TouchableOpacity>
+      ) : (
+        <View />
+      )}
       <StatusBar style="auto" />
     </View>
   );
@@ -59,21 +74,22 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#ff00ff",
+    backgroundColor: "#28263b",
   },
   title: {
-    fontSize: 24,
-    color: "black",
+    fontSize: 30,
+    color: "white",
   },
   image: {
     width: 200,
     height: 200,
-    resizeMode:"contain"
+    resizeMode: "contain",
   },
   btn: {
     marginBottom: 20,
     color: "blue",
-    backgroundColor: "blue",
+    backgroundColor: "#dad8e7",
+    borderRadius: 15,
     padding: 7,
     margin: 30,
   },
